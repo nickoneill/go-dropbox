@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	// "bytes"
 	// "time"
-	// "alloy-d/goauth"
 	"github.com/garyburd/go-oauth"
 )
 
@@ -22,17 +21,18 @@ type DropboxClient struct {
 }
 
 type QuotaInfo struct {
-	shared int32
-	quota int32
-	normal int32
+	Shared uint64
+	Quota uint64
+	Normal uint64
 }
 
 type AccountInfo struct {
-	referral_link string
-	display_name string
-	uid int16
-	country string
-	quota_info *QuotaInfo
+	Referral_link string
+	Display_name string
+	Country string
+	Email string
+	Uid uint32
+	Quota_info *QuotaInfo
 }
 
 var ( 
@@ -43,6 +43,7 @@ var (
 	}
 )
 
+// returns a new dropbox object you can use to authenticate with and subsequently make API requests against
 func NewClient(app_key string, app_secret string) *DropboxClient {
 	oauthClient.Credentials = oauth.Credentials{
 		Token:  app_key,
@@ -52,34 +53,26 @@ func NewClient(app_key string, app_secret string) *DropboxClient {
 	return &DropboxClient{"", new(http.Client), &oauthClient}
 }
 
+// returns the account info for the credentialed user
 func (drop *DropboxClient) AccountInfo(creds *oauth.Credentials) *AccountInfo {
-	
 	info := new(AccountInfo) 
 	
-	getUrl(creds, "https://api.dropbox.com/1/account/info", make(url.Values), info)
+	err := getUrl(creds, api_url + "account/info", nil, info)
+	if err != nil {
+		fmt.Printf("error getting account info: %v",err)
+	}
 	
-	fmt.Printf("info: %v",info)
 	return info
-
-	// if drop.oauth.Authorized() {
-	// 	res, err := drop.oauth.Get("https://api.dropbox.com/1/account/info", map[string]string{})
-	// 	if err != nil { return }
-	// 
-	// 	b, err := ioutil.ReadAll(res.Body)
-	// 	fmt.Printf("res: %v",string(b))
-	// } else {
-	// 	fmt.Printf("Er, not authorized")
-	// }
-	
 }
 
-func getUrl(creds *oauth.Credentials, url string, params url.Values, info *AccountInfo) error {
-	// if params == nil {
-	// 	params = make(url.Values)
-	// }
+// getUrl can sign any API GET requests with our oauth credentials
+func getUrl(creds *oauth.Credentials, getUrl string, params url.Values, info *AccountInfo) error {
+	if params == nil {
+		params = make(url.Values)
+	}
 	
-	oauthClient.SignParam(creds, "GET", url, params)
-	res, err := http.Get(url + "?" + params.Encode())
+	oauthClient.SignParam(creds, "GET", getUrl, params)
+	res, err := http.Get(getUrl + "?" + params.Encode())
 	if err != nil {
 		return err
 	}
@@ -87,17 +80,10 @@ func getUrl(creds *oauth.Credentials, url string, params url.Values, info *Accou
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
 		b, _ := ioutil.ReadAll(res.Body)
-		return fmt.Errorf("Get request for %s returned %d, %s",url,res.StatusCode,string(b))
+		return fmt.Errorf("Get request for %s returned %d, %s",getUrl,res.StatusCode,string(b))
 	}
 	
-	b, _ := ioutil.ReadAll(res.Body)
-	fmt.Printf("ok: %v\n",string(b))
-	
-	// var acctinfo []map[string]interface{}
-	// json.NewDecoder(res.Body).Decode(acctinfo)
-	// fmt.Printf("eh: %v\n",acctinfo)
-	
-	return json.NewDecoder(res.Body).Decode(info)
+	return json.NewDecoder(res.Body).Decode(&info)
 }
 
 // func (drop *DropboxClient) RootFiles() {
