@@ -4,7 +4,9 @@ A dropbox library written in Go. I whipped up a few quick calls that I needed fo
 
 ### dependencies
 
-The library uses garyburd/go-oauth, usually you can just do `goinstall github.com/garyburd/go-oauth` to install.
+The library uses http://github.com/garyburd/go-oauth, usually you can just do `goinstall github.com/garyburd/go-oauth` to install.
+
+AFAIK, this library requires a somewhat recent weekly release of Go (I built with 2012-01-15). It may be compatible with earlier releases but almost definitely not r60.
 
 ### quick start
 
