@@ -11,14 +11,8 @@ import (
 	"net/http"
 	"time"
 	"github.com/garyburd/go-oauth"
-	// "./rsync"
-	"./dropbox"
+	"github.com/nickoneill/go-dropbox"
 )
-
-type Post struct {
-	Title string
-	Body string
-}
 
 const app_key = "ylg2zoaj78ol2dz"
 const app_secret = "i2863bf9odkbdl7"
@@ -49,17 +43,17 @@ func main() {
 		fmt.Printf("loaded creds: %v\n",creds)
 		
 		// test for account info
-		fmt.Printf("results: %v\n",drop.AccountInfo(creds))
+		// fmt.Printf("results: %v\n",drop.AccountInfo(creds))
 		
 		// test for get file
 		// drop.GetFile(creds,"LLTP5.jpg")
 		
 		// test for file meta
-		// newfilemeta := drop.GetFileMeta(creds,"bloooog")
-		// fmt.Printf("files: %#v\n",newfilemeta)
-		// for i, thing := range newfilemeta.Contents {
-		// 	fmt.Printf("file %v: %#v\n",i,thing)
-		// }
+		newfilemeta := drop.GetFileMeta(creds,"bloooog")
+		fmt.Printf("files: %#v\n",newfilemeta)
+		for i, thing := range newfilemeta.Contents {
+			fmt.Printf("file %v: %#v\n",i,thing)
+		}
 	}
 	
 	// drop.CreateFolder()

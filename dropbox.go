@@ -4,11 +4,8 @@ import (
 	"fmt"
 	"net/url"
 	"net/http"
-	// "os"
 	"io/ioutil"
 	"encoding/json"
-	// "bytes"
-	// "time"
 	"github.com/garyburd/go-oauth"
 )
 
@@ -93,7 +90,7 @@ func (drop *DropboxClient) GetFile(creds *oauth.Credentials, path string) *DropF
 	return file
 }
 
-//
+// returns file meta information for a credentialed user at a given path
 func (drop *DropboxClient) GetFileMeta(creds *oauth.Credentials, path string) *DropFile {
 	file := new(DropFile)
 	
