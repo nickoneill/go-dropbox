@@ -48,7 +48,18 @@ func main() {
 	} else {
 		fmt.Printf("loaded creds: %v\n",creds)
 		
+		// test for account info
 		fmt.Printf("results: %v\n",drop.AccountInfo(creds))
+		
+		// test for get file
+		// drop.GetFile(creds,"LLTP5.jpg")
+		
+		// test for file meta
+		// newfilemeta := drop.GetFileMeta(creds,"bloooog")
+		// fmt.Printf("files: %#v\n",newfilemeta)
+		// for i, thing := range newfilemeta.Contents {
+		// 	fmt.Printf("file %v: %#v\n",i,thing)
+		// }
 	}
 	
 	// drop.CreateFolder()

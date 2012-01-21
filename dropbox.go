@@ -13,17 +13,12 @@ import (
 )
 
 const api_url = "https://api.dropbox.com/1/"
+const api_content_url = "https://api-content.dropbox.com/1/files/sandbox/"
 
 type DropboxClient struct {
 	Token string
 	Client *http.Client
 	Oauth *oauth.Client
-}
-
-type QuotaInfo struct {
-	Shared uint64
-	Quota uint64
-	Normal uint64
 }
 
 type AccountInfo struct {
@@ -33,6 +28,27 @@ type AccountInfo struct {
 	Email string
 	Uid uint32
 	Quota_info *QuotaInfo
+}
+
+type QuotaInfo struct {
+	Shared uint64
+	Quota uint64
+	Normal uint64
+}
+
+type DropFile struct {
+	Size string
+	Rev string
+	Thumb_exists bool
+	Bytes uint64
+	Modified string
+	Path string
+	Is_dir bool
+	Icon string
+	Root string
+	Mime_type string
+	Revision uint32
+	Contents []*DropFile
 }
 
 var ( 
@@ -65,8 +81,32 @@ func (drop *DropboxClient) AccountInfo(creds *oauth.Credentials) *AccountInfo {
 	return info
 }
 
-// getUrl can sign any API GET requests with our oauth credentials
-func getUrl(creds *oauth.Credentials, getUrl string, params url.Values, info *AccountInfo) error {
+//
+func (drop *DropboxClient) GetFile(creds *oauth.Credentials, path string) *DropFile {
+	file := new(DropFile)
+	
+	err := getUrl(creds, api_content_url + path, nil, file)
+	if err != nil {
+		fmt.Printf("error getting file: %v",err)
+	}
+	
+	return file
+}
+
+//
+func (drop *DropboxClient) GetFileMeta(creds *oauth.Credentials, path string) *DropFile {
+	file := new(DropFile)
+	
+	err := getUrl(creds, api_url + "metadata/sandbox/" + path, nil, file)
+	if err != nil {
+		fmt.Printf("error getting file: %v",err)
+	}
+	
+	return file
+}
+
+// getUrl signs our API GET requests with our oauth credentials
+func getUrl(creds *oauth.Credentials, getUrl string, params url.Values, data interface{}) error {
 	if params == nil {
 		params = make(url.Values)
 	}
@@ -76,57 +116,15 @@ func getUrl(creds *oauth.Credentials, getUrl string, params url.Values, info *Ac
 	if err != nil {
 		return err
 	}
-	
 	defer res.Body.Close()
+	
+	// b, _ := ioutil.ReadAll(res.Body)
+	// fmt.Printf("file: %v",string(b))
+	
 	if res.StatusCode != 200 {
 		b, _ := ioutil.ReadAll(res.Body)
 		return fmt.Errorf("Get request for %s returned %d, %s",getUrl,res.StatusCode,string(b))
 	}
 	
-	return json.NewDecoder(res.Body).Decode(&info)
+	return json.NewDecoder(res.Body).Decode(&data)
 }
-
-// func (drop *DropboxClient) RootFiles() {
-// 	
-// 	if drop.oauth.Authorized() {
-// 		res, err := drop.oauth.Get("https://api.dropbox.com/1/metadata/sandbox/", map[string]string{})
-// 		if err != nil { return }
-// 
-// 		b, err := ioutil.ReadAll(res.Body)
-// 		fmt.Printf("res: %v",string(b))
-// 	} else {
-// 		fmt.Printf("Er, not authorized")
-// 	}
-// 	
-// }
-// 
-// func (drop *DropboxClient) CreateFolder() {
-// 	
-// 	if drop.oauth.Authorized() {
-// 		res, err := drop.oauth.Post("https://api.dropbox.com/1/fileops/create_folder", map[string]string{"root":"sandbox","path":"bloooog"})
-// 		if err != nil { return }
-// 
-// 		b, err := ioutil.ReadAll(res.Body)
-// 		fmt.Printf("res: %v",string(b))
-// 	} else {
-// 		fmt.Printf("Er, not authorized")
-// 	}
-// 	
-// }
-
-
-// func (drop *DropboxClient) getToken() (*http.Response, os.Error) {
-// 	body := new(bytes.Buffer)
-// 	write := multipart.NewWriter(body)
-// 	oauth_consumer_key, _ := w.CreateFormField("oauth_consumer_key")
-// 	oauth_consumer_key.Write([]byte(""))
-// 	
-// 	// oauth_signature_method:
-// 	// oauth_signature:
-// 	// oauth_timestamp:
-// 	// oauth_nonce:
-// 	
-// 	req, _ := http.NewRequest("POST", fmt.Sprintf("%voauth/request_token",api_url), body)
-// 	
-// 	defer res.Body.Close()
-// }
