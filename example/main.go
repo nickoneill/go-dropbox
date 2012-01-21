@@ -2,10 +2,6 @@ package main
 
 import (
 	"fmt"
-	// "mustache"
-	// "path"
-	// "os"
-	// "bytes"
 	"io/ioutil"
 	"encoding/json"
 	"net/http"
@@ -14,9 +10,9 @@ import (
 	"github.com/nickoneill/go-dropbox"
 )
 
-const app_key = "ylg2zoaj78ol2dz"
-const app_secret = "i2863bf9odkbdl7"
-const callback_url = "http://nickoneill.name/callback"
+const app_key = "ENTER_YOUR_APP_KEY_HERE"
+const app_secret = "ENTER_YOUR_APP_SECRET_HERE"
+const callback_url = "http://www.someurl.com/callback"
 
 func main() {
 	fmt.Printf("howdy\n")
@@ -42,47 +38,22 @@ func main() {
 	} else {
 		fmt.Printf("loaded creds: %v\n",creds)
 		
-		// test for account info
-		// fmt.Printf("results: %v\n",drop.AccountInfo(creds))
+		test for account info
+		fmt.Printf("results: %v\n",drop.AccountInfo(creds))
 		
 		// test for get file
 		// drop.GetFile(creds,"LLTP5.jpg")
 		
 		// test for file meta
-		newfilemeta := drop.GetFileMeta(creds,"bloooog")
+		newfilemeta := drop.GetFileMeta(creds,"folder")
 		fmt.Printf("files: %#v\n",newfilemeta)
 		for i, thing := range newfilemeta.Contents {
 			fmt.Printf("file %v: %#v\n",i,thing)
 		}
 	}
-	
-	// drop.CreateFolder()
-	
-	// filename := path.Join(os.Getenv("PWD"),"source","index.mustache")
-	// 
-	// b := []byte(`{"Title":"hithere"}`)
-	// //var p Post
-	// var f interface{}
-	// 
-	// _ = json.Unmarshal(b, &f)
-	// 
-	// output := mustache.RenderFile(filename, f)
-	// 
-	// file, _ := os.OpenFile("static/index.html", os.O_RDWR | os.O_CREATE, 0666)
-	// defer file.Close()
-	// 
-	// file.Write([]byte(output))
-	// 
-	// rsync.Rsync("static/index.html", "nickoneill", "nickoneill.name", "/var/www/nickoneill.name/public_html/test/")
 }
 
 func save(fileName string, accessToken string, accessSecret string) (error) {
-	// file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0600)
-	// defer file.Close()
-	// if err != nil {
-	// 	return err
-	// }
-	
 	config := oauth.Credentials{
 		Token: accessToken,
 		Secret: accessSecret,

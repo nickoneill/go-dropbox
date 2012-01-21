@@ -78,17 +78,17 @@ func (drop *DropboxClient) AccountInfo(creds *oauth.Credentials) *AccountInfo {
 	return info
 }
 
-//
-func (drop *DropboxClient) GetFile(creds *oauth.Credentials, path string) *DropFile {
-	file := new(DropFile)
-	
-	err := getUrl(creds, api_content_url + path, nil, file)
-	if err != nil {
-		fmt.Printf("error getting file: %v",err)
-	}
-	
-	return file
-}
+// //
+// func (drop *DropboxClient) GetFile(creds *oauth.Credentials, path string) *DropFile {
+// 	file := new(DropFile)
+// 	
+// 	err := getUrl(creds, api_content_url + path, nil, file)
+// 	if err != nil {
+// 		fmt.Printf("error getting file: %v",err)
+// 	}
+// 	
+// 	return file
+// }
 
 // returns file meta information for a credentialed user at a given path
 func (drop *DropboxClient) GetFileMeta(creds *oauth.Credentials, path string) *DropFile {
