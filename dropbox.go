@@ -16,6 +16,7 @@ type DropboxClient struct {
 	Token  string
 	Client *http.Client
 	Oauth  *oauth.Client
+	Creds  *oauth.Credentials
 }
 
 type AccountInfo struct {
@@ -63,14 +64,14 @@ func NewClient(app_key string, app_secret string) *DropboxClient {
 		Secret: app_secret,
 	}
 
-	return &DropboxClient{"", new(http.Client), &oauthClient}
+	return &DropboxClient{"", new(http.Client), &oauthClient, nil}
 }
 
 // returns the account info for the credentialed user
-func (drop *DropboxClient) AccountInfo(creds *oauth.Credentials) *AccountInfo {
+func (drop *DropboxClient) AccountInfo() *AccountInfo {
 	info := new(AccountInfo)
 
-	err := getUrl(creds, api_url+"account/info", nil, info)
+	err := drop.getUrl(api_url+"account/info", nil, info)
 	if err != nil {
 		fmt.Printf("error getting account info: %v", err)
 	}
@@ -91,10 +92,10 @@ func (drop *DropboxClient) AccountInfo(creds *oauth.Credentials) *AccountInfo {
 // }
 
 // returns file meta information for a credentialed user at a given path
-func (drop *DropboxClient) GetFileMeta(creds *oauth.Credentials, path string) *DropFile {
+func (drop *DropboxClient) GetFileMeta(path string) *DropFile {
 	file := new(DropFile)
 
-	err := getUrl(creds, api_url+"metadata/sandbox/"+path, nil, file)
+	err := drop.getUrl(api_url+"metadata/sandbox/"+path, nil, file)
 	if err != nil {
 		fmt.Printf("error getting file: %v", err)
 	}
@@ -103,12 +104,12 @@ func (drop *DropboxClient) GetFileMeta(creds *oauth.Credentials, path string) *D
 }
 
 // getUrl signs our API GET requests with our oauth credentials
-func getUrl(creds *oauth.Credentials, getUrl string, params url.Values, data interface{}) error {
+func (drop *DropboxClient) getUrl(getUrl string, params url.Values, data interface{}) error {
 	if params == nil {
 		params = make(url.Values)
 	}
 
-	oauthClient.SignParam(creds, "GET", getUrl, params)
+	oauthClient.SignParam(drop.Creds, "GET", getUrl, params)
 	res, err := http.Get(getUrl + "?" + params.Encode())
 	if err != nil {
 		return err
