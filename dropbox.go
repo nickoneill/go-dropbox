@@ -3,6 +3,7 @@ package dropbox
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"github.com/garyburd/go-oauth"
 	"io/ioutil"
 	"net/http"
@@ -79,17 +80,22 @@ func (drop *DropboxClient) AccountInfo() *AccountInfo {
 	return info
 }
 
-// //
-// func (drop *DropboxClient) GetFile(creds *oauth.Credentials, path string) *DropFile {
-// 	file := new(DropFile)
-// 	
-// 	err := getUrl(creds, api_content_url + path, nil, file)
-// 	if err != nil {
-// 		fmt.Printf("error getting file: %v",err)
-// 	}
-// 	
-// 	return file
-// }
+// returns a string with the file contents at a given path
+func (drop *DropboxClient) GetFile(path string) (string, error) {
+	fileAPIURL := apiContentURL(path)
+	params := make(url.Values)
+
+	drop.Oauth.SignParam(drop.Creds, "GET", fileAPIURL, params)
+	res, err := http.Get(fileAPIURL + "?" + params.Encode())
+	if err != nil {
+		fmt.Printf("get file error %v\n",err)
+		return "", err
+	}
+	defer res.Body.Close()
+	
+	b, _ := ioutil.ReadAll(res.Body)
+	return string(b), nil
+}
 
 // returns file meta information for a credentialed user at a given path
 func (drop *DropboxClient) GetFileMeta(path string) *DropFile {
@@ -125,4 +131,13 @@ func (drop *DropboxClient) getUrl(getUrl string, params url.Values, data interfa
 	}
 
 	return json.NewDecoder(res.Body).Decode(&data)
+}
+
+func apiContentURL(path string) string {
+	fullurl, err := url.Parse(api_content_url + strings.TrimLeft(path,"/"))
+	if err != nil {
+		fmt.Printf("url parse error: %v",err)
+	}
+	
+	return fullurl.String()
 }
