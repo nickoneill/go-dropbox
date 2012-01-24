@@ -40,15 +40,13 @@ func main() {
 
 	} else {
 		fmt.Printf("loaded creds: %v\n", creds)
+		drop.Creds = creds
 
 		// test for account info
-		fmt.Printf("results: %v\n", drop.AccountInfo(creds))
-
-		// test for get file
-		// drop.GetFile(creds,"LLTP5.jpg")
+		fmt.Printf("results: %v\n", drop.AccountInfo())
 
 		// test for file meta
-		newfilemeta := drop.GetFileMeta(creds, "folder")
+		newfilemeta := drop.GetFileMeta("folder")
 		fmt.Printf("files: %#v\n", newfilemeta)
 		for i, thing := range newfilemeta.Contents {
 			fmt.Printf("file %v: %#v\n", i, thing)
