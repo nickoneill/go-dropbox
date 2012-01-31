@@ -12,6 +12,7 @@ import (
 
 const api_url = "https://api.dropbox.com/1/"
 const api_content_url = "https://api-content.dropbox.com/1/files/sandbox/"
+const api_fileput_url = "https://api-content.dropbox.com/1/files_put/sandbox/"
 
 type DropboxClient struct {
 	Token  string
@@ -86,6 +87,7 @@ func (drop *DropboxClient) GetFile(path string) (string, error) {
 	params := make(url.Values)
 
 	drop.Oauth.SignParam(drop.Creds, "GET", fileAPIURL, params)
+
 	res, err := http.Get(fileAPIURL + "?" + params.Encode())
 	if err != nil {
 		fmt.Printf("get file error %v\n",err)
@@ -107,6 +109,37 @@ func (drop *DropboxClient) GetFileMeta(path string) *DropFile {
 	}
 
 	return file
+}
+
+// puts file contents at a specified path
+func (drop *DropboxClient) PutFile(path string, body string) error {
+	
+	params := make(url.Values)
+	params.Add("overwrite", "true")
+	
+	err := drop.putUrl(api_fileput_url + path, params, body)
+	if err != nil {
+		fmt.Printf("error putting file: %v", err)
+		return err
+	}
+	
+	return nil
+}
+
+// putUrl signs API PUT requests with oauth credentials
+func (drop *DropboxClient) putUrl(putUrl string, params url.Values, body string) error {
+	if params == nil {
+		params = make(url.Values)
+	}
+	
+	client := &http.Client{}
+	
+	oauthClient.SignParam(drop.Creds, "PUT", putUrl, params)
+	
+	req, err := http.NewRequest("PUT", putUrl + "?" + params.Encode(), strings.NewReader(body))
+	_, err = client.Do(req)
+	
+	return err
 }
 
 // getUrl signs our API GET requests with our oauth credentials
@@ -140,4 +173,5 @@ func apiContentURL(path string) string {
 	}
 	
 	return fullurl.String()
+	// return api_content_url + strings.TrimLeft(path,"/")
 }
