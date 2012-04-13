@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/garyburd/go-oauth"
+	"github.com/garyburd/go-oauth/oauth"
 	"github.com/nickoneill/go-dropbox"
 	"io/ioutil"
 	"net/http"
