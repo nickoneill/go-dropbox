@@ -1,3 +1,5 @@
+## This is pretty old and I'm not currently using it so it's pretty stale. I highly suggest using a different library.
+
 # go-dropbox
 
 A dropbox library written in Go. I whipped up a few quick calls that I needed for a separate project but by no means does it cover the entire [Dropbox API](https://www.dropbox.com/developers/reference/api). Enjoy, and please contribute if you require more API methods.
