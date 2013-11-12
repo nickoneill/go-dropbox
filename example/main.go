@@ -21,7 +21,8 @@ func main() {
 
 	creds, err := load("config.json")
 	if err != nil {
-		tempcred, err := drop.Oauth.RequestTemporaryCredentials(http.DefaultClient, callback_url)
+		tempcred, err := drop.Oauth.RequestTemporaryCredentials(http.DefaultClient, callback_url, nil)
+
 		if err != nil {
 			fmt.Printf("err! %v", err)
 			return
@@ -29,7 +30,7 @@ func main() {
 
 		fmt.Printf("token stuff: %v %v\n", tempcred.Token, tempcred.Secret)
 
-		url := drop.Oauth.AuthorizationURL(tempcred)
+		url := drop.Oauth.AuthorizationURL(tempcred, nil)
 		fmt.Printf("auth url: %v\n", url)
 
 		time.Sleep(15e9)
